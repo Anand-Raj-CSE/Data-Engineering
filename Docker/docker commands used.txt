@@ -7,7 +7,8 @@
 4.  run any container
     docker run -d -p 80:80 docker/getting-started
 5. check all the runnig containers
-    docker ps
+    doWill continue docker later on , starting with airflow nowcker ps
 6. clear screen ---> cls
 7. Stop container 
     docker stop container id
+--- 
