@@ -1,0 +1,2 @@
+1. Initializing the project :
+    astro dev init
