@@ -1,2 +1,16 @@
 1. Initializing the project :
     astro dev init
+2. to run everything on docker :
+    astro dev start
+    It will start running airflow on local host: 8080
+    The login credentials are admin , admin all in username and passwordboth bu default.
+    For initial part it would take time as it would install airflow solely on machine and then 
+    initialize a docker container for it to run over.
+
+3. When airflow is up and running then we go to DAGs , by default there is one DAG created as there is 
+already a exampledag.py file in dags that will run automatically. There we could see all the functions 
+being called and we can schedule as well from there.
+
+4. Finallly to stop the airflow and the docker container we can use :
+    astro dev stop
+    It would delete all the instances and will abandon all the docker container.
