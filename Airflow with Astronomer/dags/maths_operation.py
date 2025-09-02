@@ -11,31 +11,31 @@ from airflow.operators.python import PythonOperator
 from datetime import datetime
 
 def start_number(**context):
-    context["t1"].xcom_push(key='current_value',value=10,task_id = 'start_task')
+    context["ti"].xcom_push(key='current_value',value=10)#,task_id = 'start_task')
     print("Starting number is 10")
 
 def add5(**context):
-    current_value = context['t1'].xcom_pull(key='current_value',task_id = 'add')
+    current_value = context['ti'].xcom_pull(key='current_value',task_ids = 'start_task')
     new_value = current_value + 5
-    context["t1"].xcom_push(key='current_value',value=new_value)
+    context["ti"].xcom_push(key='current_value',value=new_value)
     print(f"Adding 5 to : {current_value}, so new value is : {new_value}")
 
 def multiply_by_2(**context):
-    current_value = context['t1'].xcom_pull(key='current_value',task_ids='multiply')
+    current_value = context['ti'].xcom_pull(key='current_value',task_ids='add')
     new_value = current_value*2
-    context["t1"].xcom_push(key='current_value',value=new_value)
+    context["ti"].xcom_push(key='current_value',value=new_value)
     print(f"Multiplying 2 to : {current_value}, so new value is: {new_value}")
 
 def subtarct3(**context):
-    current_value = context['t1'].xcom_pull(key='current_value',task_ids='subtract')
+    current_value = context['ti'].xcom_pull(key='current_value',task_ids='multiply')
     new_value = current_value-3
-    context["t1"].xcom_push(key='current_value',value=new_value)
+    context["ti"].xcom_push(key='current_value',value=new_value)
     print(f"subtracting 3 from : {current_value}, so new value is: {new_value}")    
 
 def square2(**context):
-    current_value = context['t1'].xcom_pull(key='current_value',task_ids='square')
+    current_value = context['ti'].xcom_pull(key='current_value',task_ids='subtract')
     new_value = current_value*current_value
-    context["t1"].xcom_push(key='current_value',value=new_value)
+    context["ti"].xcom_push(key='current_value',value=new_value)
     print(f"Square of : {current_value}, so new value is: {new_value}") 
 
 with DAG(
