@@ -33,26 +33,26 @@ with DAG(
         postgres_hook.run(create_table_query)
 
     # Step 2 : Extract the NASA API Data APOD - Astronomy Picture of the Day [Extract pipeline]
-    #
+    #  https://api.nasa.gov/planetary/apod?api_key=DQRvPmHTEvaePSVNKMNkHgJ1a6OaP8SOpWoTSJLO 
     extract_apod = SimpleHttpOperator(
         task_id = 'extract_apod',
         http_conn_id='nasa_api', 
         endpoint = 'planetary/apod', #NASA API endpoint for APOD
         method='GET',
-        data={"api_key":"{{conn.nasa_api.extra_dejson.api_key}}"} # USE this API key
+        data={"api_key":"{{conn.nasa_api.extra_dejson.api_key}}"}, # USE this API key
         response_filter = lambda response:response.json(), #Convert response to json
     )
 
     # Step 3 : Transform the data (Pick the information that we need to save)
     @task
     def transform_apod_data(response):
-        apod_data = (
+        apod_data = {
             'title' : response.get('title',''), # If key is not available then it will give us blank
             'explaination': response.get('explaination',''),
             'url': response.get('url',''),
             'date':response.get('date',''),
             'media_type': response.get('media_type','')
-        )
+        }
         return apod_data
 
     # Step 4 : Loading the data into the Postgres SQL
@@ -77,4 +77,9 @@ with DAG(
 
     # Step 5 : verify the details using DBviewer
 
-    # Step 6 : Create dependencies
+    # Step 6 : Define the task dependencies
+    create_table() >> extract_apod # extract apod is simply a http request
+    # every http request has an output so we need to store that
+    api_resposnse = extract_apod.output
+    transformed_data = transform_apod_data(api_resposnse)
+    load_data_to_postgres(transformed_data)
